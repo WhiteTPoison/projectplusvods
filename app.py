@@ -24,6 +24,9 @@ def get_channels():
     channels = []
     with open('data/channel_ids.txt') as f:
         for line in f.readlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
             url, rest = line.split(': ')
             _, name = rest.split(' ')[0], rest.split(' ')[1:]
             name = ' '.join(name)
@@ -87,11 +90,8 @@ def search_page():
     if not c2 or c2.lower() == 'any':
         c2 = ''
     event = request.args.get('event') or ''
-    rank = request.args.get('rank')
-    if not rank or rank.lower() == 'any':
-        rank = ''
 
-    search_results = list(db.search_vods(p1, p2, c1, c2, event, rank))
+    search_results = list(db.search_vods(p1, p2, c1, c2, event))
     patches = db.load_patches()
     vods = db.patch_vods(search_results, patches)
 
@@ -125,7 +125,6 @@ def search_page():
         p1=p1,
         p2=p2,
         event=event,
-        rank=rank,
         channels=get_channels(),
         is_search=True,
         pagination=pagination,

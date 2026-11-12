@@ -13,7 +13,7 @@ def get_vods_sheet() -> Worksheet | None:
 
     # These values should be replaced with your actual Google Sheet ID and worksheet name
 
-    sheet_id = '1RRblTHe9hmlQDmOw05dglEXmnuH0fcB7f-ZqHjBOyT4'
+    sheet_id = '1kKvNCndcfb4ePEtqtyjCbqHNPnTq1kxkUaZtPF1YOAM'
     worksheet_name = 'vods'
 
     try:

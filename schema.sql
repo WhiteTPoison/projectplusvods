@@ -97,41 +97,91 @@ CREATE INDEX idx_vod_c2 ON vod (c2_id);
 CREATE INDEX idx_vod_p1 ON vod (p1_id);
 CREATE INDEX idx_vod_p2 ON vod (p2_id);
 
-INSERT INTO game (name) VALUES ("Rivals of Aether 2");
+INSERT INTO game (name) VALUES ("Project+");
 
 -- Random = 1
 INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Random", "./static/characters/random.png");
--- Clairen = 2
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Clairen", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/clairen_small.png");
--- Ranno = 3
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ranno", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/ranno_small.png");
--- Zetter = 4
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Zetterburn", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/zetter_small.png");
--- Forsburn = 5
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Forsburn", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/fors_small.png");
--- Orcane = 6
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Orcane", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/orcane_small.png");
--- Fleet = 7
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Fleet", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/fleet_small.png");
--- Kragg = 8
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Kragg", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/kragg_small.png");
--- Wrastor = 9
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Wrastor", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/wrastor_small.png");
--- Loxodont = 10
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Loxodont", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/loxodont_small.png");
--- Maypul = 11
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Maypul", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/maypul_small.png");
--- Etalus = 12
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Etalus", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/etalus_small.png");
--- Olympia = 13
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Olympia", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/oly_small.png");
--- Absa = 14
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Absa", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/absa_small.png");
--- Galvan = 15
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Galvan", "https://akbiggs-vods-18c62d7f-a87a-4da5-b315-7a7f450c7577.s3.us-east-2.amazonaws.com/galvan_small.png");
--- La Reina = 16
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "La Reina", "./static/characters/lareina.png");
--- Slade = 17
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Slade", "./static/characters/slade.png");
--- Gouie = 18
-INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Gouie", "./static/characters/gouie.png");
+-- Bowser = 2
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Bowser", "./static/characters/bowser.png");
+-- Captain Falcon = 3
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Captain Falcon", "./static/characters/captain_falcon.png");
+-- Charizard = 4
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Charizard", "./static/characters/charizard.png");
+-- Diddy Kong = 5
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Diddy Kong", "./static/characters/diddy_kong.png");
+-- Donkey Kong = 6
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Donkey Kong", "./static/characters/donkey_kong.png");
+-- Falco = 7
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Falco", "./static/characters/falco.png");
+-- Fox = 8
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Fox", "./static/characters/fox.png");
+-- Ganondorf = 9
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ganondorf", "./static/characters/ganondorf.png");
+-- Ice Climbers = 10
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ice Climbers", "./static/characters/ice_climbers.png");
+-- Ike = 11
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ike", "./static/characters/ike.png");
+-- Ivysaur = 12
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ivysaur", "./static/characters/ivysaur.png");
+-- Jigglypuff = 13
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Jigglypuff", "./static/characters/jigglypuff.png");
+-- King Dedede = 14
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "King Dedede", "./static/characters/king_dedede.png");
+-- Kirby = 15
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Kirby", "./static/characters/kirby.png");
+-- Knuckles = 16
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Knuckles", "./static/characters/knuckles.png");
+-- Link = 17
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Link", "./static/characters/link.png");
+-- Lucario = 18
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Lucario", "./static/characters/lucario.png");
+-- Lucas = 19
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Lucas", "./static/characters/lucas.png");
+-- Luigi = 20
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Luigi", "./static/characters/luigi.png");
+-- Mario = 21
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Mario", "./static/characters/mario.png");
+-- Marth = 22
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Marth", "./static/characters/marth.png");
+-- Meta Knight = 23
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Meta Knight", "./static/characters/meta_knight.png");
+-- Mewtwo = 24
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Mewtwo", "./static/characters/mewtwo.png");
+-- Mr. Game & Watch = 25
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Mr. Game & Watch", "./static/characters/mr_game_and_watch.png");
+-- Ness = 26
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Ness", "./static/characters/ness.png");
+-- Olimar = 27
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Olimar", "./static/characters/olimar.png");
+-- Peach = 28
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Peach", "./static/characters/peach.png");
+-- Pikachu = 29
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Pikachu", "./static/characters/pikachu.png");
+-- Pit = 30
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Pit", "./static/characters/pit.png");
+-- R.O.B. = 31
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "R.O.B.", "./static/characters/rob.png");
+-- Roy = 32
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Roy", "./static/characters/roy.png");
+-- Samus = 33
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Samus", "./static/characters/samus.png");
+-- Sheik = 34
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Sheik", "./static/characters/sheik.png");
+-- Snake = 35
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Snake", "./static/characters/snake.png");
+-- Sonic = 36
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Sonic", "./static/characters/sonic.png");
+-- Squirtle = 37
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Squirtle", "./static/characters/squirtle.png");
+-- Toon Link = 38
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Toon Link", "./static/characters/toon_link.png");
+-- Wario = 39
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Wario", "./static/characters/wario.png");
+-- Wolf = 40
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Wolf", "./static/characters/wolf.png");
+-- Yoshi = 41
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Yoshi", "./static/characters/yoshi.png");
+-- Zelda = 42
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Zelda", "./static/characters/zelda.png");
+-- Zero Suit Samus = 43
+INSERT INTO game_character (game_id, name, icon_url) VALUES (1, "Zero Suit Samus", "./static/characters/zero_suit_samus.png");

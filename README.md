@@ -1,8 +1,8 @@
-# Rivals of Aether 2 VODs
+# Project+ VODs
 
-This is a simple website for collecting and searching Rivals of Aether 2 VODs. https://www.rivals2vods.com
+This is a simple website for collecting and searching Project+ VODs. It is based on [vods2](https://github.com/akbiggs/vods2), the Rivals of Aether 2 VOD site by akbiggs.
 
-If you only wish to contribute VODs to our database via the Google Sheet, you can skip the following instructions and instead apply for access [here](https://docs.google.com/spreadsheets/d/1RRblTHe9hmlQDmOw05dglEXmnuH0fcB7f-ZqHjBOyT4/edit?gid=0#gid=0).
+If you only wish to contribute VODs to our database via the Google Sheet, you can skip the following instructions and instead apply for access [here](https://docs.google.com/spreadsheets/d/1kKvNCndcfb4ePEtqtyjCbqHNPnTq1kxkUaZtPF1YOAM/edit?gid=1869225218#gid=1869225218).
 
 ## Developer instructions
 
@@ -18,13 +18,13 @@ You only need to do this once.
 2. Clone the repository:
 
     ```sh
-    git clone https://github.com/akbiggs/vods2
+    git clone https://github.com/WhiteTPoison/projectplusvods
     ```
 
 3. Enter the directory.
 
     ```sh
-    cd vods2
+    cd projectplusvods
     ```
 
 4. Create a virtual environment in the project directory:
@@ -106,7 +106,7 @@ python3 -m flask ingest-csv directory/file.csv
 
 Using a Google Sheet is recommended over a CSV file because it allows contributors to update VOD data without needing to commit changes to a git tracked file or create pull requests. However the setup is longer.
 
-If you only wish to contribute VODs to our database via the Google Sheet, you can skip the following instructions and instead apply for access [here](https://docs.google.com/spreadsheets/d/1RRblTHe9hmlQDmOw05dglEXmnuH0fcB7f-ZqHjBOyT4/edit?gid=0#gid=0).
+If you only wish to contribute VODs to our database via the Google Sheet, you can skip the following instructions and instead apply for access [here](https://docs.google.com/spreadsheets/d/1kKvNCndcfb4ePEtqtyjCbqHNPnTq1kxkUaZtPF1YOAM/edit?gid=1869225218#gid=1869225218).
 
 ---
 
@@ -122,7 +122,7 @@ https://developers.google.com/workspace/guides/create-project
 
 - Create a service account in your Google Cloud project
 - Generate a **JSON key file**
-- Download it and place it in the top-level `vods2` directory
+- Download it and place it in the top-level `projectplusvods` directory
 
 The file must be named:
 
@@ -153,10 +153,10 @@ You can find the sheet ID in the URL:
 
 You can find the worksheet name at the bottom of the Google Sheet.
 
-For example our Google Sheet's URL is `https://docs.google.com/spreadsheets/d/1RRblTHe9hmlQDmOw05dglEXmnuH0fcB7f-ZqHjBOyT4` and the worksheet name is `vods`.
+For example our Google Sheet's URL is `https://docs.google.com/spreadsheets/d/1kKvNCndcfb4ePEtqtyjCbqHNPnTq1kxkUaZtPF1YOAM` and the worksheet name is `vods`.
 
 ```python
-sheet_id = '1RRblTHe9hmlQDmOw05dglEXmnuH0fcB7f-ZqHjBOyT4'
+sheet_id = '1kKvNCndcfb4ePEtqtyjCbqHNPnTq1kxkUaZtPF1YOAM'
 worksheet_name = 'vods'
 ```
 
@@ -180,7 +180,7 @@ On production, new updates are typically pulled to and from the Google Sheet by 
 
 You will need to
 [get a YouTube API key](https://developers.google.com/youtube/v3/getting-started)
-and put it in a `youtube_api_key` file in the top-level `vods2` folder. Note
+and put it in a `youtube_api_key` file in the top-level `projectplusvods` folder. Note
 that there is no file extension on `youtube_api_key`.
 
 You can add VODs from a YouTube channel to the database using the following
@@ -193,7 +193,7 @@ python3 -m flask ingest-channel <channel_id> '<search_query>' '<video_title_form
 where:
 
 - `channel_id` is the YouTube channel ID. I get the ID using [this website](https://www.streamweasels.com/%20tools/youtube-channel-id-and-%20user-id-convertor/).
-    - The channel IDs for the websites I pull from are stored in [`data/channel_ids.txt`](https://github.com/akbiggs/vods2/blob/main/data/channel_ids.txt).
+    - The channel IDs for the websites I pull from are stored in [`data/channel_ids.txt`](data/channel_ids.txt).
 - `search_query` is an optional query to reduce what videos get queried from the channel. For example if you are trying to get VODs that have the word "Blah" in the title, you can type `'"Blah"'`.
 - `video_title_format` describes the format of the video title (where the event name, the player names, and the character names are).
     - `%P1`: Where the first player name goes.
@@ -203,18 +203,18 @@ where:
     - `%E`: (optional) The event name.
     - `%R`: (optional) The round name.
     - `%V`: (optional) Some versus text, for example "vs", "VS", "vs.".
-    - `%ROA`: (optional) Some reference to Rivals of Aether II, for example "RoA2", "Rivals of Aether II", "Rivals 2".
+    - `%PP`: (optional) Some reference to Project+, for example "P+", "Project+", "Project Plus", "PPlus".
 
-For example, if you want to add Rivals II videos from [Collision Gaming Series](https://www.youtube.com/@CollisionSeries), an example video title is "Bay State Beatdown 138 Rivals 2 - FC | Vidad (Clairen) vs yc | Pip (Maypul) - Grand Finals", and the corresponding command would be:
+For example, if a channel titles its videos like "Pico Plus #16 P+ - Player A (Falco) vs Player B (Marth) - Grand Finals", the corresponding command would be:
 
 ```sh
-python3 -m flask ingest-channel UCn_LdOLhjFF3_fgBrk-7y9A '""' '%E Rivals 2 - %P1 (%C1) %V %P2 (%C2) - %R'
+python3 -m flask ingest-channel <channel_id> '""' '%E %PP - %P1 (%C1) %V %P2 (%C2) - %R'
 ```
 
-If you only want VODs from Bay State Beatdown 138, the command would be:
+If you only want VODs from Pico Plus #16, the command would be:
 
 ```sh
-python3 -m flask ingest-channel UCn_LdOLhjFF3_fgBrk-7y9A '"Bay State Beatdown 138"' '%E Rivals 2 - %P1 (%C1) %V %P2 (%C2) - %R'
+python3 -m flask ingest-channel <channel_id> '"Pico Plus #16"' '%E %PP - %P1 (%C1) %V %P2 (%C2) - %R'
 ```
 
 ### Adding VODs from a YouTube playlist
@@ -238,16 +238,16 @@ where:
     - `%E`: (optional) The event name.
     - `%R`: (optional) The round name.
     - `%V`: (optional) Some versus text, for example "vs", "VS", "vs.".
-    - `%ROA`: (optional) Some reference to Rivals of Aether II, for example "RoA2", "Rivals of Aether II", "Rivals 2".
+    - `%PP`: (optional) Some reference to Project+, for example "P+", "Project+", "Project Plus", "PPlus".
 
-For example if you want to add the playlist for [Monthly of Aether #9: NA](https://www.youtube.com/playlist?list=PLG_10Q9RHnFwFQwGbNUmz_hO6mUJiAnei), an example video title is:
+For example, if a playlist for "Blacklisted 9" has video titles like:
 
-> Ant ( Absa ) vs Bbatts ( Fleet ) - [ Pools ]
+> Player A ( Falco ) vs Player B ( Marth ) - [ Pools ]
 
 The corresponding command would be:
 
 ```sh
-python3 -m flask ingest-playlist "https://www.youtube.com/playlist?list=PLG_10Q9RHnFwFQwGbNUmz_hO6mUJiAnei" "Monthly of Aether #9: NA" "%P1 ( %C1 ) %V %P2 ( %C2 ) - [ %R ]"
+python3 -m flask ingest-playlist "<playlist_url>" "Blacklisted 9" "%P1 ( %C1 ) %V %P2 ( %C2 ) - [ %R ]"
 ```
 
 ### Adding VODs automatically from a large VOD (experimental)
@@ -263,7 +263,7 @@ python3 -m pip install -q -U google-genai==1.32.0
 
 You also need to
 [get a Gemini API key](https://aistudio.google.com/apikey)
-and put it in a `gemini_api_key` file in the top-level `vods2` folder. Note
+and put it in a `gemini_api_key` file in the top-level `projectplusvods` folder. Note
 that there is no file extension on `gemini_api_key`.
 
 You can then ingest a large VOD using:

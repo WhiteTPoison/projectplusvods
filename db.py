@@ -10,23 +10,48 @@ from models import Vod, Patch, VodAndPatch, ParsedVodTitle
 
 CHAR_NAME_TO_ID = {
     "random": 1,
-    "clairen": 2,
-    "ranno": 3,
-    "zetterburn": 4,
-    "forsburn": 5,
-    "orcane": 6,
-    "fleet": 7,
-    "kragg": 8,
-    "wrastor": 9,
-    "loxodont": 10,
-    "maypul": 11,
-    "etalus": 12,
-    "olympia": 13,
-    "absa": 14,
-    "galvan": 15,
-    "la reina": 16,
-    "slade": 17,
-    "gouie": 18
+    "bowser": 2,
+    "captain falcon": 3,
+    "charizard": 4,
+    "diddy kong": 5,
+    "donkey kong": 6,
+    "falco": 7,
+    "fox": 8,
+    "ganondorf": 9,
+    "ice climbers": 10,
+    "ike": 11,
+    "ivysaur": 12,
+    "jigglypuff": 13,
+    "king dedede": 14,
+    "kirby": 15,
+    "knuckles": 16,
+    "link": 17,
+    "lucario": 18,
+    "lucas": 19,
+    "luigi": 20,
+    "mario": 21,
+    "marth": 22,
+    "meta knight": 23,
+    "mewtwo": 24,
+    "mr. game & watch": 25,
+    "ness": 26,
+    "olimar": 27,
+    "peach": 28,
+    "pikachu": 29,
+    "pit": 30,
+    "r.o.b.": 31,
+    "roy": 32,
+    "samus": 33,
+    "sheik": 34,
+    "snake": 35,
+    "sonic": 36,
+    "squirtle": 37,
+    "toon link": 38,
+    "wario": 39,
+    "wolf": 40,
+    "yoshi": 41,
+    "zelda": 42,
+    "zero suit samus": 43
 }
 
 # STATUS VALUES
@@ -37,7 +62,7 @@ APPROVED_STATUS = 3
 
 # GAME VALUES
 
-RIVALS_OF_AETHER_TWO = 1
+PROJECT_PLUS = 1
 
 def get_db():
     if 'db' not in g:
@@ -62,44 +87,38 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+# Common nicknames, abbreviations and misspellings, mapped to canonical names.
+CHAR_ALIASES = {
+    "falcon": "captain falcon", "c. falcon": "captain falcon", "c.falcon": "captain falcon",
+    "c falcon": "captain falcon", "cf": "captain falcon", "capt. falcon": "captain falcon",
+    "dedede": "king dedede", "d3": "king dedede", "ddd": "king dedede", "king d3": "king dedede",
+    "diddy": "diddy kong", "dk": "donkey kong",
+    "ganon": "ganondorf", "ganondorfdorf": "ganondorf",
+    "ics": "ice climbers", "ic": "ice climbers", "icies": "ice climbers", "icys": "ice climbers", "ice climber": "ice climbers",
+    "ivy": "ivysaur",
+    "puff": "jigglypuff", "jiggs": "jigglypuff", "jigglypuf": "jigglypuff",
+    "knux": "knuckles",
+    "mk": "meta knight", "metaknight": "meta knight",
+    "m2": "mewtwo", "mew2": "mewtwo",
+    "g&w": "mr. game & watch", "gnw": "mr. game & watch", "gw": "mr. game & watch", "g & w": "mr. game & watch",
+    "game & watch": "mr. game & watch", "game and watch": "mr. game & watch", "mr game & watch": "mr. game & watch",
+    "mr. game and watch": "mr. game & watch", "mr game and watch": "mr. game & watch", "mr. g&w": "mr. game & watch",
+    "oli": "olimar", "olimar & alph": "olimar", "alph": "olimar",
+    "pika": "pikachu",
+    "rob": "r.o.b.", "r.o.b": "r.o.b.",
+    "shiek": "sheik",
+    "solid snake": "snake",
+    "squirt": "squirtle",
+    "tink": "toon link", "tl": "toon link", "toonlink": "toon link", "t.link": "toon link",
+    "zss": "zero suit samus", "zero suit": "zero suit samus", "zerosuit samus": "zero suit samus",
+    "zard": "charizard",
+    "rand": "random",
+}
+
 def get_character_id(name):
-    name = name.strip().lower()
-
-    # Common nicknames and misspellings.
-    if name == 'clarien': name = 'clairen'
-    if name == 'eta': name = 'etalus'
-    if name == 'zetter': name = 'zetterburn'
-    if name == 'zettersburn': name = 'zetterburn'
-    if name == 'fors': name = 'forsburn'
-    if name == "forseburn": name = "forsburn"
-    if name == 'oly': name = 'olympia'
-    if name == 'maple': name = 'maypul'
-    if name == 'mapul': name = 'maypul'
-    if name == 'lox': name = 'loxodont'
-    if name == "galvin": name = "galvan"
-    if name == "la reyna": name = "la reina"
-    if name == "lareina": name = "la reina"
-    if name == "la raina": name = "la reina"
-    if name == "krag": name = "kragg"
-    if name == "gooey": name = "gouie"
-    if name == "gooie": name = "gouie"
-
-    #This is done specifically for https://www.youtube.com/@SuperiorCalRivals2
-    if name == "for" : name = "forsburn"
-    if name == "zet" : name = "zetterburn"
-    if name == "lox" : name = "loxodont"
-    if name == "may" : name = "maypul"
-    if name == "eta" : name = "etalus"
-    if name == "oly" : name = "olympia"
-    if name == "abs" : name = "absa"
-    if name == "gal" : name = "galvan"
-    if name == "wra" : name = "wrastor"
-    if name == "ran" : name = "ranno"
-    if name == "kra" : name = "kragg"
-    if name == "cla" : name = "clairen"
-    if name == "fle" : name = "fleet"
-    if name == "lar" : name = "la reina"
-
+    # When multiple characters are listed (e.g. "Falco, Mario" or "Falco/Mario"), use the first one.
+    name = re.split(r'[,/]', name)[0].strip().lower()
+    name = CHAR_ALIASES.get(name, name)
     return CHAR_NAME_TO_ID.get(name)
 
 def ensure_event(event):
@@ -128,7 +147,7 @@ def create_submission(url, p1_char, p2_char, p1_tag, p2_tag, event, round, date)
     INSERT INTO submission (game_id, url, status, p1, c1, p2, c2, event, round, date)
     VALUES                 (?,       ?,   ?,      ?,  ?,  ?,  ?,  ?,     ?,     ?);
     """,
-    (RIVALS_OF_AETHER_TWO, url, NOT_REVIEWED_STATUS, p1_tag, p1_char, p2_tag, p2_char, event, round, date,))
+    (PROJECT_PLUS, url, NOT_REVIEWED_STATUS, p1_tag, p1_char, p2_tag, p2_char, event, round, date,))
     db.commit()
 
 def vod_exists(url):
@@ -164,40 +183,15 @@ def latest_vods(amount=10000):
         ))
     return result
 
-def search_vods(p1, p2, c1, c2, event, rank, amount=10000):
+def search_vods(p1, p2, c1, c2, event, amount=10000):
     db = get_db()
 
     p1_match = '%' + p1 + '%'
     p2_match = '%' + p2 + '%'
-    c1_match = '%' + c1 + '%'
-    c2_match = '%' + c2 + '%'
+    c1_match = c1 if c1 else '%'
+    c2_match = c2 if c2 else '%'
     event_match = '%' + event + '%'
 
-    rank_source = None
-    rank_count = None
-    if rank and rank.lower() in ['one_lunarank', 'two_lunarank']:
-        rank_source = 'data/lunarank.txt'
-        rank_count = 1 if rank == 'one_lunarank' else 2
-    if rank and rank.lower() in ['one_alexrank', 'two_alexrank']:
-        rank_source = 'data/alexrank.txt'
-        rank_count = 1 if rank == 'one_alexrank' else 2
-    
-    rank_query = ''
-    if rank_source:
-        players = []
-        with open(rank_source) as f:
-            for line in f.readlines():
-                if line.startswith('#'):
-                    continue
-                players.append(line.strip().lower())
-        if rank_count == 1:
-            p1_query = ' OR '.join([f"p1.tag LIKE '%{p}%'" for p in players])
-            p2_query = ' OR '.join([f"p2.tag LIKE '%{p}%'" for p in players])
-            rank_query = f'AND (({p1_query}) OR ({p2_query}))'
-        else:
-            p1_query = ' OR '.join([f"p1.tag LIKE '%{p}%'" for p in players])
-            p2_query = ' OR '.join([f"p2.tag LIKE '%{p}%'" for p in players])
-            rank_query = f'AND ({p1_query}) AND ({p2_query})'
 
     vods = None
     if c1 != c2:
@@ -214,7 +208,7 @@ def search_vods(p1, p2, c1, c2, event, rank, amount=10000):
             AND (p1.tag LIKE ? OR p2.tag LIKE ?)
             AND (c1.name LIKE ? OR c2.name LIKE ?)
             AND (c1.name LIKE ? OR c2.name LIKE ?)
-            AND (e.name LIKE ?) """ + rank_query + """
+            AND (e.name LIKE ?)
         ORDER BY vod_date DESC
         LIMIT ?;
         """, (p1_match, p1_match, p2_match, p2_match, c1_match, c1_match, c2_match, c2_match, event_match, amount,)).fetchall()
@@ -231,7 +225,7 @@ def search_vods(p1, p2, c1, c2, event, rank, amount=10000):
             (p1.tag LIKE ? OR p2.tag LIKE ?)
             AND (p1.tag LIKE ? OR p2.tag LIKE ?)
             AND (c1.name LIKE ? AND c2.name LIKE ?)
-            AND (e.name LIKE ?) """ + rank_query + """
+            AND (e.name LIKE ?)
         ORDER BY vod_date DESC
         LIMIT ?;
         """, (p1_match, p1_match, p2_match, p2_match, c1_match, c1_match, event_match, amount,)).fetchall()
@@ -339,7 +333,7 @@ def review_submissions_command():
                 db.cursor().execute('''
                                     INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
                                     VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);''',
-                                    (RIVALS_OF_AETHER_TWO, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date.isoformat() if vod_date else ''))
+                                    (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date.isoformat() if vod_date else ''))
                 db.commit()
                 break
             elif action == 'r':
@@ -372,7 +366,7 @@ def review_submissions_command():
                     db.cursor().execute('''
                         INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
                         VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);''',
-                        (RIVALS_OF_AETHER_TWO, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date.isoformat() if vod_date else ''))
+                        (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date.isoformat() if vod_date else ''))
                     
                     db.commit()
 
@@ -415,7 +409,7 @@ def ingest_sheet_command():
         db.cursor().execute("""
                             INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
                             VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);
-                            """, (RIVALS_OF_AETHER_TWO, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
+                            """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
     db.commit()
 
     # Update the last updated date in the metadata table.
@@ -446,6 +440,8 @@ def ingest_csv_command(filename: str | None):
     num_vods = 0
     with open(filename) as csvfile:
         for url, p1, c1, p2, c2, event, round, vod_time in csv.reader(csvfile):
+            if url.strip().lower() == 'url':
+                continue  # Header row.
             if vod_exists(url):
                 # click.echo(f"Skipping existing vod {url}.")
                 continue
@@ -460,7 +456,7 @@ def ingest_csv_command(filename: str | None):
             db.cursor().execute("""
                               INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
                               VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);
-                              """, (RIVALS_OF_AETHER_TWO, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
+                              """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
     db.commit()
     click.echo(f"Ingested {num_vods} vods.")
 
@@ -539,7 +535,7 @@ def ingest_channel_command(channel_id, query, format):
             db.cursor().execute("""
                               INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round)
                               VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,        ?);
-                              """, (RIVALS_OF_AETHER_TWO, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, published_at, info.round,))
+                              """, (PROJECT_PLUS, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, published_at, info.round,))
         
         return results
 
@@ -649,7 +645,7 @@ def ingest_playlist_command(playlist_url, event_name, format_str):
             db.cursor().execute("""
                 INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-            """, (RIVALS_OF_AETHER_TWO, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, published_at, info.round,))
+            """, (PROJECT_PLUS, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, published_at, info.round,))
 
         return results
 
@@ -967,7 +963,7 @@ The YouTube playback time must be in seconds.
         db.cursor().execute("""
                             INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round)
                             VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,        ?);
-                            """, (RIVALS_OF_AETHER_TWO, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round,))
+                            """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round,))
 
     response = input(f'Are you sure you want to commit {len(results)} VODs? [y/n] ')
     if response.lower() in ['y', 'yes']:
@@ -991,8 +987,8 @@ def ingest_multi_vod_command(multi_vod_url, event, datetime_str, title_format, f
 
     where description.txt is lines in the format:
 
-        00:00 Alex (Zetterburn) vs. Bob (Olympia)
-        43:20 Cynthia (Wrastor) vs. Dylan (Forsburn)
+        00:00 Alex (Falco) vs. Bob (Marth)
+        43:20 Cynthia (Lucas) vs. Dylan (Wolf)
     """
     results = []
     with open(filename, 'r') as f:
@@ -1036,7 +1032,7 @@ def ingest_multi_vod_command(multi_vod_url, event, datetime_str, title_format, f
             db.cursor().execute("""
                               INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, vod_date, round)
                               VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,        ?);
-                              """, (RIVALS_OF_AETHER_TWO, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, datetime_str, info.round,))
+                              """, (PROJECT_PLUS, info.event_id, url, info.p1_id, info.p2_id, info.c1_id, info.c2_id, datetime_str, info.round,))
 
     click.echo('\n'.join(results))
     response = input(f'Are you sure you want to commit {len(results)} VODs? [y/n] ')
@@ -1070,7 +1066,7 @@ def title_query_to_regex_str(query):
                     .replace('%C1', r'(?P<c1>[\s*\w/*,*]+)')
                     .replace('%C2', r'(?P<c2>[\s*\w/*,*]+)')
                     .replace('%V', '((vs.)|(vs)|(Vs.)|(VS.)|(Vs)|(VS))')
-                    .replace('%ROA', '((RoA2)|(ROA2)|(RoA 2)|(ROA 2)|(RoAII)|(ROAII)|(Rivals II)|(RIVALS 2)|(RIVALS II)|(RIVALS OF AETHER 2)|(RIVALS OF AETHER II)|(Rivals 2)|(Rivals of Aether 2)|(Rivals 2 Tournament)|(Rivals of Aether II)|(Rivals II Bracket)|(Rivals 2 Bracket))?')
+                    .replace('%PP', r'((Project\s*\+)|(PROJECT\s*\+)|(Project Plus)|(PROJECT PLUS)|(P\+)|(PPlus)|(PPLUS))?')
                     .replace('%R', r'(?P<round>[\s*\(*\s*\w\-#&;\)*]+)'))
 
 def parse_vod_title(title, url, format_regex, default_event_name="Unknown"):
@@ -1259,9 +1255,11 @@ def push_csv_sheet_command(path: str | None = None):
     except Exception as e:
         click.echo(f'Error updating sheet: {e}')
 
-sqlite3.register_converter(
-    "timestamp", lambda v: datetime.fromisoformat(v.decode().replace('Z', '+00:00'))
-)
+def _parse_timestamp(v):
+    dt = datetime.fromisoformat(v.decode().replace('Z', '+00:00'))
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+sqlite3.register_converter("timestamp", _parse_timestamp)
 
 def init_app(app):
     app.teardown_appcontext(close_db)

@@ -3,7 +3,7 @@
         Last updated: {{ last_updated }} |
         <span class="event-navbar">
         {% for event in recent_events -%}
-            <a href="/?c1=any&c2=any&p1=&p2=&event={{ event.url }}&rank=any">
+            <a href="/?c1=any&c2=any&p1=&p2=&event={{ event.url }}">
             {{ event.name }}</a>{% if not loop.last %}, {% endif %}
         {%- endfor %}
         </span>

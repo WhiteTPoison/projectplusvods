@@ -13,14 +13,7 @@
        git add . && git commit -m "Automatic regular queries" && git push origin main
      ```
 
-- Add the following channels:
-  - https://www.youtube.com/@gamequestpg/streams
-  - https://youtube.com/@RivalsofAetherEurope/videos
-  - https://www.youtube.com/@SuperiorCalRivals2/videos hasn't been parsed correctly apparently?
-  - https://www.youtube.com/@broscalamity/videos
-  - https://www.youtube.com/@thedunkdojogaming/videos
-  - https://www.youtube.com/@dgttx512/videos
-  - Most of these are from https://docs.google.com/spreadsheets/d/1C3rJHZWzKMurMJmjACMEB1JZziPyNMrj57b5fE-4t9A/edit?gid=0#gid=0
+- Add Project+ YouTube channels to data/channel_ids.txt and data/regular_queries.txt.
 - Work on vod-splitter for faster ingestion of large untagged vods https://github.com/Ludini1/vod-splitter
 - Backfill large untagged vods (for example Hop On has a lot of good high-level content, Hop On #24 - #1 need to be ingested)
 - Maybe a Google Form for people to suggest YouTube channels to be added, to reduce DMs? I don't feel strongly, I'm fine

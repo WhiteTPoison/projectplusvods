@@ -1,7 +1,7 @@
 [project]
-name = "vods2"
+name = "projectplusvods"
 version = "0.1.0"
-description = "Rivals of Aether 2 VODs."
+description = "Project+ VODs."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
