@@ -183,7 +183,7 @@ def latest_vods(amount=10000):
         ))
     return result
 
-def search_vods(p1, p2, c1, c2, event, amount=10000):
+def search_vods(p1, p2, c1, c2, event, amount=-1):  # -1 = no LIMIT in SQLite
     db = get_db()
 
     p1_match = '%' + p1 + '%'

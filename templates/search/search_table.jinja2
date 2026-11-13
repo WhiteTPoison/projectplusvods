@@ -51,9 +51,29 @@
       </div>
 
       <!-- Event -->
-      <div class="form-group event-rank">
+      <div class="form-group">
         <label for="event_search">Event:</label>
         <input type="text" id="event_search" name="event" placeholder="Event" autocomplete="off" {% if event %} value="{{event}}" {% endif %}>
+      </div>
+
+      <!-- Patch -->
+      <div class="form-group">
+        <label for="patch_search">Patch:</label>
+        <select id="patch_search" name="patch">
+          <option value="any" {% if not patch %} selected {% endif %}>Any</option>
+          <option value="P+" {% if patch == 'P+' %} selected {% endif %}>All Project+</option>
+          <option value="PM" {% if patch == 'PM' %} selected {% endif %}>All Project M</option>
+          <optgroup label="--- Project+ ---">
+          {% for name in patch_names if name.startswith('P+ ') %}
+            <option value="{{ name }}" {% if patch == name %} selected {% endif %}>{{ name }}</option>
+          {% endfor %}
+          </optgroup>
+          <optgroup label="--- Project M ---">
+          {% for name in patch_names if name.startswith('PM ') %}
+            <option value="{{ name }}" {% if patch == name %} selected {% endif %}>{{ name }}</option>
+          {% endfor %}
+          </optgroup>
+        </select>
       </div>
     </div>
 

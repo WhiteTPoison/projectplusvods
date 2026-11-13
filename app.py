@@ -90,10 +90,20 @@ def search_page():
     if not c2 or c2.lower() == 'any':
         c2 = ''
     event = request.args.get('event') or ''
+    patch = request.args.get('patch') or ''
+    if patch.lower() == 'any':
+        patch = ''
 
     search_results = list(db.search_vods(p1, p2, c1, c2, event))
     patches = db.load_patches()
     vods = db.patch_vods(search_results, patches)
+
+    # Patches are assigned by date after the query, so the patch filter is applied here.
+    # 'P+' / 'PM' match every patch of that game; anything else must match a patch name exactly.
+    if patch in ('P+', 'PM'):
+        vods = [v for v in vods if v.patch_name and v.patch_name.startswith(patch + ' ')]
+    elif patch:
+        vods = [v for v in vods if v.patch_name == patch]
 
     #pagination
 
@@ -125,6 +135,8 @@ def search_page():
         p1=p1,
         p2=p2,
         event=event,
+        patch=patch,
+        patch_names=[p.name for p in patches],
         channels=get_channels(),
         is_search=True,
         pagination=pagination,

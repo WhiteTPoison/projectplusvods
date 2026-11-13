@@ -54,7 +54,9 @@ td {
 		max-height 0.3s ease,
 		height 0.3s ease;
 	border-radius: 5px;
-	margin-left: 0.5rem;
+	/* centered on desktop */
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /*shrink table when search is open*/
@@ -93,6 +95,12 @@ body:has(details[open]) .vod-table-container {
 
 .patchHeader {
 	width: 9%;
+}
+
+/* Keep dates and patch names (e.g. "PM Demo 2.1") on one line. */
+.vodtable td:first-child,
+.vodtable td:last-child {
+	white-space: nowrap;
 }
 
 /* Info icon in header */
@@ -162,6 +170,7 @@ body:has(details[open]) .vod-table-container {
 	width: 60%;
 	display: flex;
 	justify-content: center;
+	margin: 0 auto;
 }
 
 summary {
@@ -197,7 +206,8 @@ body:has(details[closed]) summary {
 
 .search-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	/* Always two columns: characters, then players, then event + patch. */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 0.75rem 1rem;
 	align-items: center;
 	margin-top: 0.25rem;
@@ -223,6 +233,8 @@ body:has(details[closed]) summary {
 
 .search-form input,
 .search-form select {
+	min-width: 0;
+	box-sizing: border-box;
 	padding: 0.35rem 0.5rem;
 	font-size: 0.95rem;
 	border-radius: 4px;
@@ -270,6 +282,8 @@ body:has(details[closed]) summary {
 	max-width: 60%;
 	max-height: 6%;
 	margin-top: 0.5rem;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /* this is the container holding the first pagination div */
@@ -409,9 +423,10 @@ body:has(details[closed]) summary {
 	}
 }
 
-@media (min-width: 1280px) and (max-width: 1919px) {
+@media (min-width: 1001px) and (max-width: 1919px) {
 	.vod-table-container {
 		max-width: 100%;
+		margin-left: 0.5rem;
 		margin-right: 0.5rem;
 		max-height: 78vh;
 	}
@@ -426,17 +441,12 @@ body:has(details[closed]) summary {
 	}
 	.pagination-links {
 		max-width: 100%;
-		margin-right: 0.5rem;
+		padding-right: 0.5rem;
 	}
 }
 
 /*Mobile Fixes*/
 @media (max-width: 1000px) {
-	.search-grid {
-		display: flex;
-		flex-direction: column;
-	}
-
 	.content-body-search {
 		display: flex;
 		justify-content: flex-start;
@@ -477,15 +487,15 @@ body:has(details[closed]) summary {
 		min-width: 100%;
 	}
 
+	.patchHeader {
+		width: 10%;
+	}
+
 	table td:first-child,
 	table th:first-child,
 	table td:last-child,
 	table th:last-child {
-		display: none;
-	}
-
-	.patchHeader {
-		width: 10%;
+		white-space: nowrap;
 	}
 
 	a {
@@ -512,5 +522,37 @@ body:has(details[closed]) summary {
 	}
 	.pagination-links > nav {
 		transform: translateX(30%);
+	}
+}
+
+/* Desktop: fit the search page to the window. The page is a full-height column and the VOD
+   table takes whatever height is left (scrolling inside itself), instead of fixed vh heights. */
+@media (min-width: 1001px) {
+	body:has(.content-body) {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		box-sizing: border-box;
+		padding-bottom: 0.5rem;
+	}
+	body:has(.content-body) > * {
+		flex-shrink: 0;
+	}
+	/* Natural height, but shrinks to the space left when there are many rows. */
+	body:has(.content-body) > .content-body {
+		flex: 0 1 auto;
+		min-height: 0;
+	}
+	/* Flex items' sizes count as definite, so 100% here is the space left for the table. */
+	body:has(.content-body) .content-body .vod-table-container {
+		max-height: 100%;
+		min-height: 0;
+		box-sizing: border-box;
+	}
+	/* A flex item with auto margins shrinks to its content; keep the bar its normal width. */
+	body:has(.content-body) .pagination-links {
+		max-height: none;
+		width: 100%;
+		box-sizing: border-box;
 	}
 }
