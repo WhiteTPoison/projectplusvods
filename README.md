@@ -90,6 +90,22 @@ Manually adding VODs can be done in two ways:
 
 _A Google Sheet is recommended but instructions for both are provided below._
 
+#### VOD data format
+
+The Google Sheet and CSV files use the same columns, one row per match:
+
+| URL | Player 1 | Character 1 | Player 2 | Character 2 | Event Name | Round (Optional) | Date (YYYY-MM-DD) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `https://www.youtube.com/watch?v=...` | Player A | Fox, Falco | Player B | Marth | Example Event | Grand Finals | 2026-11-07 |
+
+**Multiple characters per player:** when a player used more than one character in a set, list all of them in that player's character cell, separated by commas (e.g. `Fox, Falco`). A slash (`Fox/Falco`) also works.
+
+- Characters are shown as icons side by side, in the order they are listed.
+- Searching for any of a player's characters finds the match.
+- `Mr. Game & Watch` is a single character: `&` is not a separator.
+- Common short forms (`Falcon`, `ZSS`, `D3`, `ICs`, ...) are accepted (see `CHAR_ALIASES` in `db.py`); unknown names are skipped. Use `Random` when a character is unknown.
+- In the database, the first character is stored in `c1_id`/`c2_id` and the rest in `c1_extra_ids`/`c2_extra_ids`. `export-sheet` and `export-csv` write them back out as `Character, Character`.
+
 #### Adding VODs from a CSV file
 
 ```sh

@@ -19,8 +19,8 @@
       <td>
         <span>
           <a href="{{ vod.url }}" rel="noopener noreferrer">
-            <img src="{{ vod.c1_icon_url }}" width="24" height="24"/> {{ vod.p1_tag }} vs. 
-            <img src="{{ vod.c2_icon_url }}" width="24" height="24"/> {{ vod.p2_tag }}
+            <span class="char-icons">{% for name, icon in vod.c1_chars %}<img src="{{ icon }}" width="24" height="24" alt="{{ name }}" title="{{ name }}"/>{% endfor %}</span> {{ vod.p1_tag }} vs.
+            <span class="char-icons">{% for name, icon in vod.c2_chars %}<img src="{{ icon }}" width="24" height="24" alt="{{ name }}" title="{{ name }}"/>{% endfor %}</span> {{ vod.p2_tag }}
           </a>
         </span>
       </td>

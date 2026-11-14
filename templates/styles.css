@@ -166,6 +166,14 @@ body:has(details[open]) .vod-table-container {
 	margin: 0 0.25rem;
 }
 
+/* A player's characters sit side by side, closer together than the gap to the tag. */
+.char-icons {
+	white-space: nowrap;
+}
+.char-icons img + img {
+	margin-left: -0.15rem;
+}
+
 .content-body-search {
 	width: 60%;
 	display: flex;
@@ -245,6 +253,140 @@ body:has(details[closed]) summary {
 
 .search-form input::placeholder {
 	color: #bbb;
+}
+
+/* Patch multi-select: a button that looks like the other dropdowns, opening a checkbox list. */
+.multi-select {
+	position: relative;
+	min-width: 0;
+}
+
+.multi-select-toggle {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.35rem 0.5rem;
+	font-size: 0.95rem;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	background-color: #181818;
+	color: #f5f5f5;
+	cursor: pointer;
+	text-align: left;
+}
+
+.multi-select-toggle::after {
+	content: "\25BE";
+	flex-shrink: 0;
+}
+
+.multi-select-summary {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.multi-select-menu {
+	position: absolute;
+	z-index: 20;
+	top: calc(100% + 2px);
+	/* At least wide enough for the footer; grows leftward so it stays on screen in the right column. */
+	right: 0;
+	width: max(100%, 17rem);
+	box-sizing: border-box;
+	max-height: 18rem;
+	overflow-y: auto;
+	/* Never scroll sideways, even when a visible scrollbar takes some of the width. */
+	overflow-x: hidden;
+	padding: 0.25rem 0 0;
+	background-color: #181818;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.multi-select-menu[hidden] {
+	display: none;
+}
+
+.multi-select-menu label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.25rem 0.6rem;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.multi-select-menu label:hover {
+	background-color: #2a2a2a;
+}
+
+.multi-select-menu .multi-select-option {
+	padding-left: 1.6rem;
+}
+
+.multi-select-menu .multi-select-group {
+	font-weight: bold;
+	border-top: 1px solid #2e2e53;
+	margin-top: 0.25rem;
+	padding-top: 0.4rem;
+}
+
+.multi-select-menu .multi-select-group:first-child {
+	border-top: none;
+	margin-top: 0;
+}
+
+.search-form .multi-select-menu input[type="checkbox"] {
+	padding: 0;
+	margin: 0;
+	accent-color: #6161b2;
+}
+
+/* Shift+click would otherwise highlight the label text between the two clicks. */
+.multi-select-menu label {
+	user-select: none;
+}
+
+/* Pinned to the bottom of the menu so the hint and Clear stay visible while the list scrolls. */
+.multi-select-footer {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	margin-top: 0.25rem;
+	padding: 0.4rem 0.6rem;
+	background-color: #181818;
+	border-top: 1px solid #2e2e53;
+}
+
+.multi-select-hint {
+	/* Wraps instead of pushing Clear out of view when space is tight. */
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 0.8rem;
+	line-height: 1.2;
+	color: #999;
+}
+
+.multi-select-clear {
+	flex-shrink: 0;
+	padding: 0.2rem 0.6rem;
+	background-color: #181818;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	color: #f5f5f5;
+	cursor: pointer;
+}
+
+.multi-select-clear:hover {
+	background-color: #333;
 }
 
 .rank-links {

@@ -115,11 +115,40 @@ CHAR_ALIASES = {
     "rand": "random",
 }
 
+def get_character_ids(name):
+    """All character IDs in a cell like "Falco, Fox" or "Falco/Fox", in order, without duplicates.
+    Unknown names are skipped. ("Mr. Game & Watch" is one character, so '&' is not a separator.)"""
+    ids = []
+    for part in re.split(r'[,/]', name or ''):
+        part = part.strip().lower()
+        char_id = CHAR_NAME_TO_ID.get(CHAR_ALIASES.get(part, part))
+        if char_id and char_id not in ids:
+            ids.append(char_id)
+    return ids
+
 def get_character_id(name):
     # When multiple characters are listed (e.g. "Falco, Mario" or "Falco/Mario"), use the first one.
-    name = re.split(r'[,/]', name)[0].strip().lower()
-    name = CHAR_ALIASES.get(name, name)
-    return CHAR_NAME_TO_ID.get(name)
+    ids = get_character_ids(name)
+    return ids[0] if ids else None
+
+def split_characters(name):
+    """(first character ID, the other IDs as "7,21" or None) for storing in vod.cN_id / vod.cN_extra_ids."""
+    ids = get_character_ids(name)
+    if not ids:
+        return None, None
+    return ids[0], ','.join(str(i) for i in ids[1:]) or None
+
+def parse_extra_ids(extra_ids):
+    return [int(i) for i in extra_ids.split(',') if i] if extra_ids else []
+
+def character_map():
+    """{character id: (name, icon_url)} for every character."""
+    rows = get_db().cursor().execute("SELECT id, name, icon_url FROM game_character;").fetchall()
+    return {id: (name, icon_url) for id, name, icon_url in rows}
+
+def characters_for(chars, first_id, extra_ids):
+    """[(name, icon_url), ...] for one side of a vod."""
+    return [chars[i] for i in [first_id] + parse_extra_ids(extra_ids) if i in chars]
 
 def ensure_event(event):
     """Creates a new Event entry if it doesn't already exist and returns the ID."""
@@ -158,7 +187,7 @@ def vod_exists(url):
 def latest_vods(amount=10000):
     db = get_db()
     vods = db.cursor().execute("""
-    SELECT vod.id, vod.url, p1.tag, p2.tag, c1.name, c1.icon_url, c2.name, c2.icon_url, e.name, vod.round, vod.vod_date
+    SELECT vod.id, vod.url, p1.tag, p2.tag, vod.c1_id, vod.c1_extra_ids, vod.c2_id, vod.c2_extra_ids, e.name, vod.round, vod.vod_date
     FROM vod
         INNER JOIN event e ON e.id = vod.event_id
         INNER JOIN player p1 ON p1.id = vod.p1_id
@@ -168,94 +197,162 @@ def latest_vods(amount=10000):
     ORDER BY vod_date DESC
     LIMIT ?
     """, (amount,)).fetchall()
-    
+
+    chars = character_map()
     result = []
-    for id, url, p1_tag, p2_tag, c1_name, c1_icon_url, c2_name, c2_icon_url, event, round, vod_date in vods:
+    for id, url, p1_tag, p2_tag, c1_id, c1_extra, c2_id, c2_extra, event, round, vod_date in vods:
         result.append(Vod(
             url=url,
             round=round,
             p1_tag=p1_tag,
             p2_tag=p2_tag,
-            c1_icon_url=c1_icon_url,
-            c2_icon_url=c2_icon_url,
+            c1_chars=characters_for(chars, c1_id, c1_extra),
+            c2_chars=characters_for(chars, c2_id, c2_extra),
             vod_date=vod_date,
             event_name=event
         ))
     return result
 
 def search_vods(p1, p2, c1, c2, event, amount=-1):  # -1 = no LIMIT in SQLite
+    """c1/c2 are lowercase character names ('' for any). A player matches a character if it is any of
+    the characters they played; with both set, the two must be on opposite sides."""
     db = get_db()
 
     p1_match = '%' + p1 + '%'
     p2_match = '%' + p2 + '%'
-    c1_match = c1 if c1 else '%'
-    c2_match = c2 if c2 else '%'
     event_match = '%' + event + '%'
 
+    c1_id = get_character_id(c1) if c1 else None
+    c2_id = get_character_id(c2) if c2 else None
+    if (c1 and not c1_id) or (c2 and not c2_id):
+        return []  # Unknown character name.
 
-    vods = None
-    if c1 != c2:
-        vods = db.cursor().execute("""
-        SELECT vod.id, vod.url, p1.tag, p2.tag, c1.name, c1.icon_url, c2.name, c2.icon_url, e.name, vod.round, vod.vod_date
-        FROM vod
-            INNER JOIN event e ON e.id = vod.event_id
-            INNER JOIN player p1 ON p1.id = vod.p1_id
-            INNER JOIN player p2 ON p2.id = vod.p2_id
-            INNER JOIN game_character c1 ON c1.id = vod.c1_id
-            INNER JOIN game_character c2 ON c2.id = vod.c2_id
-        WHERE
-            (p1.tag LIKE ? OR p2.tag LIKE ?)
-            AND (p1.tag LIKE ? OR p2.tag LIKE ?)
-            AND (c1.name LIKE ? OR c2.name LIKE ?)
-            AND (c1.name LIKE ? OR c2.name LIKE ?)
-            AND (e.name LIKE ?)
-        ORDER BY vod_date DESC
-        LIMIT ?;
-        """, (p1_match, p1_match, p2_match, p2_match, c1_match, c1_match, c2_match, c2_match, event_match, amount,)).fetchall()
-    else:
-        vods = db.cursor().execute("""
-        SELECT vod.id, vod.url, p1.tag, p2.tag, c1.name, c1.icon_url, c2.name, c2.icon_url, e.name, vod.round, vod.vod_date
-        FROM vod
-            INNER JOIN event e ON e.id = vod.event_id
-            INNER JOIN player p1 ON p1.id = vod.p1_id
-            INNER JOIN player p2 ON p2.id = vod.p2_id
-            INNER JOIN game_character c1 ON c1.id = vod.c1_id
-            INNER JOIN game_character c2 ON c2.id = vod.c2_id
-        WHERE
-            (p1.tag LIKE ? OR p2.tag LIKE ?)
-            AND (p1.tag LIKE ? OR p2.tag LIKE ?)
-            AND (c1.name LIKE ? AND c2.name LIKE ?)
-            AND (e.name LIKE ?)
-        ORDER BY vod_date DESC
-        LIMIT ?;
-        """, (p1_match, p1_match, p2_match, p2_match, c1_match, c1_match, event_match, amount,)).fetchall()
+    def side_has(side, char_id):
+        if not char_id:
+            return '1', []
+        return (f"(vod.c{side}_id = ? OR (',' || IFNULL(vod.c{side}_extra_ids, '') || ',') LIKE ?)",
+                [char_id, f'%,{char_id},%'])
 
+    a1, a1_params = side_has(1, c1_id)
+    b2, b2_params = side_has(2, c2_id)
+    a2, a2_params = side_has(2, c1_id)
+    b1, b1_params = side_has(1, c2_id)
+
+    vods = db.cursor().execute(f"""
+    SELECT vod.id, vod.url, p1.tag, p2.tag, vod.c1_id, vod.c1_extra_ids, vod.c2_id, vod.c2_extra_ids, e.name, vod.round, vod.vod_date
+    FROM vod
+        INNER JOIN event e ON e.id = vod.event_id
+        INNER JOIN player p1 ON p1.id = vod.p1_id
+        INNER JOIN player p2 ON p2.id = vod.p2_id
+        INNER JOIN game_character c1 ON c1.id = vod.c1_id
+        INNER JOIN game_character c2 ON c2.id = vod.c2_id
+    WHERE
+        (p1.tag LIKE ? OR p2.tag LIKE ?)
+        AND (p1.tag LIKE ? OR p2.tag LIKE ?)
+        AND (({a1} AND {b2}) OR ({a2} AND {b1}))
+        AND (e.name LIKE ?)
+    ORDER BY vod_date DESC
+    LIMIT ?;
+    """, [p1_match, p1_match, p2_match, p2_match] + a1_params + b2_params + a2_params + b1_params
+         + [event_match, amount]).fetchall()
+
+    chars = character_map()
     result = []
-    for id, url, p1_tag, p2_tag, c1_name, c1_icon_url, c2_name, c2_icon_url, event, round, vod_date in vods:
+    for id, url, p1_tag, p2_tag, vc1_id, c1_extra, vc2_id, c2_extra, event, round, vod_date in vods:
+        side1 = characters_for(chars, vc1_id, c1_extra)
+        side2 = characters_for(chars, vc2_id, c2_extra)
+        side1_ids = [vc1_id] + parse_extra_ids(c1_extra)
+        side2_ids = [vc2_id] + parse_extra_ids(c2_extra)
         # Make the character order match the search query if it doesn't already.
-        if c2_name.lower() == c1:
-            result.append(Vod(
-                url=url,
-                round=round,
-                p1_tag=p2_tag,
-                p2_tag=p1_tag,
-                c1_icon_url=c2_icon_url,
-                c2_icon_url=c1_icon_url,
-                vod_date=vod_date,
-                event_name=event
-            ))
-        else:
-            result.append(Vod(
-                url=url,
-                round=round,
-                p1_tag=p1_tag,
-                p2_tag=p2_tag,
-                c1_icon_url=c1_icon_url,
-                c2_icon_url=c2_icon_url,
-                vod_date=vod_date,
-                event_name=event
-            ))
-    return result
+        swap = (c1_id and c1_id not in side1_ids) or (not c1_id and c2_id and c2_id not in side2_ids)
+        if swap:
+            p1_tag, p2_tag, side1, side2 = p2_tag, p1_tag, side2, side1
+        result.append(Vod(
+            url=url,
+            round=round,
+            p1_tag=p1_tag,
+            p2_tag=p2_tag,
+            c1_chars=side1,
+            c2_chars=side2,
+            vod_date=vod_date,
+            event_name=event
+        ))
+    return sort_by_date_and_round(result)
+
+# --- Ordering VODs within an event by round ----------------------------------------------------
+# Round labels are free text ("Winners Semi-Finals", "Pool A Losers R2", "Top 8 (Grand Finals"...),
+# so they are normalized and scored: higher = later in the event. Results stay newest-first, and
+# within one event the latest round (Grand Finals) comes first.
+
+_ROUND_NORMALIZE = [
+    (r'grand\s*finals?', 'grand finals'),
+    (r"semi[\s-]*(?:finals?|'?s)?", 'semis'),
+    (r"quarter[\s-]*(?:finals?|'?s)?", 'quarters'),
+    (r'\bfinals?\b', 'finals'),
+    (r'\bwf\b', 'winners finals'),
+    (r'\blf\b', 'losers finals'),
+    (r'\bloser\b', 'losers'),
+    (r'\bwinner\b', 'winners'),
+    (r'\br(\d+)\b', r'round \1'),
+    (r'\btop\s*(\d+)', r'top \1'),
+    (r'\b(?:eighths|8ths|eights|t8)\b', 'top 8'),
+]
+
+def _round_score(r):
+    """Position of the round inside its bracket (pools or main bracket)."""
+    side = 'L' if 'losers' in r else 'W' if 'winners' in r else None
+    if 'grand finals' in r:
+        return 100 if 'reset' in r else 99
+    if 'finals' in r:
+        return 97 if side == 'L' else 98
+    if 'semis' in r:
+        return 95 if side == 'L' else 96
+    if 'quarters' in r:
+        return 93 if side == 'L' else 94
+    m = re.search(r'\bround (\d+)', r)
+    if m:
+        n = int(m.group(1))
+        # Losers round n is played around winners round n/2 + 1.
+        return 40.5 + n if side == 'L' else 40 + 2 * n
+    m = re.search(r'\btop (\d+)', r)
+    if m:
+        n = int(m.group(1))
+        score = {6: 92.5, 8: 92, 12: 88.5, 16: 88, 24: 85, 32: 84}.get(n, 80)
+        qualifier = re.search(r'\bqual', r)  # "Qualifier", "Qualifiers", "Qual".
+        if qualifier:
+            score -= 2  # The match that decides who reaches that top N.
+        if side == 'L' and n == 8 and not qualifier:
+            score = 91  # Losers top 8 (losers eighths).
+        return score - (0.5 if side == 'L' else 0)
+    if re.search(r'\bqual', r):
+        return 59.5 if side == 'L' else 60  # Last match of a pool.
+    return 0
+
+def _round_phase(r):
+    """Which part of the event: main bracket, pools/divisions, side brackets, side events."""
+    if re.search(r'exhibition|money match|friendlies|\bladder\b', r):
+        return -1000
+    if re.search(r'\bammy\b|amateur|redemption', r):
+        return -800
+    m = re.search(r'\bdiv(?:ision)?\.? ?(\d+)', r)
+    if m:
+        # Division brackets come after pools (division 1 first). A division's own pools, and pool
+        # matches that qualify into a division ("Losers Division 2 Qualifier"), stay with pools.
+        return (-500 if re.search(r'pool|\bqual', r) else -300) - 10 * int(m.group(1))
+    if re.search(r'pool|swiss|placement|relegation', r):
+        return -500
+    return 0
+
+def round_rank(round_name):
+    r = ' '.join((round_name or '').lower().split())
+    for pattern, replacement in _ROUND_NORMALIZE:
+        r = re.sub(pattern, replacement, r)
+    return _round_phase(r) + _round_score(r)
+
+def sort_by_date_and_round(vods):
+    """Newest first; VODs from the same day and event go from the latest round to the earliest."""
+    vods = sorted(vods, key=lambda v: (v.event_name, -round_rank(v.round)))
+    return sorted(vods, key=lambda v: v.vod_date.timestamp() if v.vod_date else float('-inf'), reverse=True)
 
 def parse_date(str):
     vod_parts = list(str.split('/'))
@@ -402,14 +499,14 @@ def ingest_sheet_command():
         p1_id = ensure_player(p1)
         p2_id = ensure_player(p2)
         event_id = ensure_event(event)
-        c1_id = get_character_id(c1)
-        c2_id = get_character_id(c2)
+        c1_id, c1_extra = split_characters(c1)
+        c2_id, c2_extra = split_characters(c2)
 
         num_vods += 1
         db.cursor().execute("""
-                            INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
-                            VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);
-                            """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
+                            INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, c1_extra_ids, c2_extra_ids, round, vod_date)
+                            VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,            ?,            ?,     ?);
+                            """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, c1_extra, c2_extra, round, vod_time,))
     db.commit()
 
     # Update the last updated date in the metadata table.
@@ -449,14 +546,14 @@ def ingest_csv_command(filename: str | None):
             p1_id = ensure_player(p1)
             p2_id = ensure_player(p2)
             event_id = ensure_event(event)
-            c1_id = get_character_id(c1)
-            c2_id = get_character_id(c2)
+            c1_id, c1_extra = split_characters(c1)
+            c2_id, c2_extra = split_characters(c2)
 
             num_vods += 1
             db.cursor().execute("""
-                              INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_date)
-                              VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,     ?);
-                              """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, round, vod_time,))
+                              INSERT INTO vod (game_id, event_id, url, p1_id, p2_id, c1_id, c2_id, c1_extra_ids, c2_extra_ids, round, vod_date)
+                              VALUES          (?,       ?,        ?,   ?,     ?,     ?,     ?,     ?,            ?,            ?,     ?);
+                              """, (PROJECT_PLUS, event_id, url, p1_id, p2_id, c1_id, c2_id, c1_extra, c2_extra, round, vod_time,))
     db.commit()
     click.echo(f"Ingested {num_vods} vods.")
 
@@ -687,7 +784,7 @@ def export_vods_command(filename: str | None):
 
     db = get_db()
     vods = db.cursor().execute("""
-    SELECT vod.id, vod.url, p1.tag, p2.tag, c1.name, c2.name, e.name, vod.round, vod.vod_date
+    SELECT vod.id, vod.url, p1.tag, p2.tag, vod.c1_id, vod.c1_extra_ids, vod.c2_id, vod.c2_extra_ids, e.name, vod.round, vod.vod_date
     FROM vod
         INNER JOIN event e ON e.id = vod.event_id
         INNER JOIN player p1 ON p1.id = vod.p1_id
@@ -698,7 +795,10 @@ def export_vods_command(filename: str | None):
     """, ()).fetchall()
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         vod_writer = csv.writer(csvfile)
-        for id, url, p1_tag, p2_tag, c1_name, c2_name, event_name, round, vod_date in vods:
+        chars = character_map()
+        for id, url, p1_tag, p2_tag, c1_id, c1_extra, c2_id, c2_extra, event_name, round, vod_date in vods:
+            c1_name = ', '.join(name for name, _ in characters_for(chars, c1_id, c1_extra))
+            c2_name = ', '.join(name for name, _ in characters_for(chars, c2_id, c2_extra))
             row = [url, p1_tag, c1_name, p2_tag, c2_name, event_name, round if round else '', vod_date if vod_date else '']
             vod_writer.writerow(row)
 
@@ -707,7 +807,7 @@ def export_sheet_command():
 
     db = get_db()
     vods = db.cursor().execute("""
-    SELECT vod.id, vod.url, p1.tag, p2.tag, c1.name, c2.name, e.name, vod.round, vod.vod_date
+    SELECT vod.id, vod.url, p1.tag, p2.tag, vod.c1_id, vod.c1_extra_ids, vod.c2_id, vod.c2_extra_ids, e.name, vod.round, vod.vod_date
     FROM vod
         INNER JOIN event e ON e.id = vod.event_id
         INNER JOIN player p1 ON p1.id = vod.p1_id
@@ -729,7 +829,10 @@ def export_sheet_command():
     
     # Build the data rows
     data_rows = []
-    for id, url, p1_tag, p2_tag, c1_name, c2_name, event_name, round, vod_date in vods:
+    chars = character_map()
+    for id, url, p1_tag, p2_tag, c1_id, c1_extra, c2_id, c2_extra, event_name, round, vod_date in vods:
+        c1_name = ', '.join(name for name, _ in characters_for(chars, c1_id, c1_extra))
+        c2_name = ', '.join(name for name, _ in characters_for(chars, c2_id, c2_extra))
         # Convert datetime to string if needed
         if isinstance(vod_date, datetime):
             vod_date_str = vod_date.isoformat()
@@ -1144,8 +1247,8 @@ def patch_vods(vods, patches):
             round=vod.round,
             p1_tag=vod.p1_tag,
             p2_tag=vod.p2_tag,
-            c1_icon_url=vod.c1_icon_url,
-            c2_icon_url=vod.c2_icon_url,
+            c1_chars=vod.c1_chars,
+            c2_chars=vod.c2_chars,
             vod_date=vod.vod_date,
             event_name=vod.event_name,
             patch_name=found_patch.name if found_patch else None,

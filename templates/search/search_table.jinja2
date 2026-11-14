@@ -56,24 +56,34 @@
         <input type="text" id="event_search" name="event" placeholder="Event" autocomplete="off" {% if event %} value="{{event}}" {% endif %}>
       </div>
 
-      <!-- Patch -->
+      <!-- Patch: a dropdown of checkboxes, so several patches can be picked -->
+      {% set patch = patch or [] %}
+      {% set groups = [('P+', 'All Project+', 'P+ '), ('PM', 'All Project M', 'PM ')] %}
       <div class="form-group">
         <label for="patch_search">Patch:</label>
-        <select id="patch_search" name="patch">
-          <option value="any" {% if not patch %} selected {% endif %}>Any</option>
-          <option value="P+" {% if patch == 'P+' %} selected {% endif %}>All Project+</option>
-          <option value="PM" {% if patch == 'PM' %} selected {% endif %}>All Project M</option>
-          <optgroup label="--- Project+ ---">
-          {% for name in patch_names if name.startswith('P+ ') %}
-            <option value="{{ name }}" {% if patch == name %} selected {% endif %}>{{ name }}</option>
-          {% endfor %}
-          </optgroup>
-          <optgroup label="--- Project M ---">
-          {% for name in patch_names if name.startswith('PM ') %}
-            <option value="{{ name }}" {% if patch == name %} selected {% endif %}>{{ name }}</option>
-          {% endfor %}
-          </optgroup>
-        </select>
+        <div class="multi-select" id="patch_select">
+          <button type="button" class="multi-select-toggle" id="patch_search" aria-haspopup="true" aria-expanded="false">
+            <span class="multi-select-summary">{{ patch | join(', ') if patch else 'Any' }}</span>
+          </button>
+          <div class="multi-select-menu" hidden>
+            {% for group, label, prefix in groups %}
+              <label class="multi-select-group">
+                <input type="checkbox" name="patch" value="{{ group }}" data-group="{{ group }}" data-short="All {{ group }}" {% if group in patch %}checked{% endif %}>
+                {{ label }}
+              </label>
+              {% for name in patch_names if name.startswith(prefix) %}
+                <label class="multi-select-option">
+                  <input type="checkbox" name="patch" value="{{ name }}" data-member="{{ group }}" {% if name in patch or group in patch %}checked{% endif %}>
+                  {{ name }}
+                </label>
+              {% endfor %}
+            {% endfor %}
+            <div class="multi-select-footer">
+              <span class="multi-select-hint">Shift+click to select a range</span>
+              <button type="button" class="multi-select-clear">Clear</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -85,3 +95,74 @@
 
   </form>
 </details>
+
+<script>
+// Patch multi-select: open/close the menu, keep "All Project+/M" in sync with its patches,
+// update the button text, and Shift+click a patch to set every patch between it and the
+// previously clicked one. On submit, a fully-ticked group is sent as just "P+"/"PM".
+(function () {
+  const root = document.getElementById('patch_select');
+  if (!root) return;
+  const toggle = root.querySelector('.multi-select-toggle');
+  const menu = root.querySelector('.multi-select-menu');
+  const summary = root.querySelector('.multi-select-summary');
+  const groups = [...root.querySelectorAll('[data-group]')];
+  const members = g => [...root.querySelectorAll(`[data-member="${g.dataset.group}"]`)];
+
+  function sync() {
+    const parts = [];
+    for (const g of groups) {
+      const m = members(g), on = m.filter(x => x.checked);
+      g.checked = on.length === m.length && m.length > 0;
+      g.indeterminate = on.length > 0 && !g.checked;
+      if (g.checked) parts.push(g.dataset.short);
+      else parts.push(...on.map(x => x.value));
+    }
+    summary.textContent = !parts.length ? 'Any' : parts.length > 3 ? parts.length + ' patches' : parts.join(', ');
+  }
+  function setOpen(open) {
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', open);
+  }
+
+  toggle.addEventListener('click', () => setOpen(menu.hidden));
+  document.addEventListener('click', e => { if (!root.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+  for (const g of groups) g.addEventListener('change', () => { members(g).forEach(x => x.checked = g.checked); sync(); });
+  root.querySelectorAll('[data-member]').forEach(x => x.addEventListener('change', sync));
+
+  // Shift+click ranges. A click on a label's text reaches the checkbox as a second, synthetic click
+  // that may not carry the Shift key, so remember it from the label click.
+  const allMembers = [...root.querySelectorAll('[data-member]')];
+  let anchor = null, labelShift = false;
+  menu.addEventListener('click', e => {
+    if (e.target.matches('input[data-member]')) {
+      const box = e.target, i = allMembers.indexOf(box);
+      if ((e.shiftKey || labelShift) && anchor !== null) {
+        const [lo, hi] = anchor < i ? [anchor, i] : [i, anchor];
+        allMembers.slice(lo, hi + 1).forEach(x => x.checked = box.checked);
+      }
+      anchor = i;
+      labelShift = false;
+      sync();
+    } else if (e.target.matches('input')) {
+      labelShift = false;  // "All Project+/M" box: not part of ranges.
+    } else if (e.target.closest('label')) {
+      labelShift = e.shiftKey;
+    }
+  });
+  root.querySelector('.multi-select-clear').addEventListener('click', () => {
+    root.querySelectorAll('input[type=checkbox]').forEach(x => x.checked = false); sync();
+  });
+  root.closest('form').addEventListener('submit', () => {
+    // Keep URLs short: a whole group goes as one value; otherwise only the individual patches.
+    for (const g of groups) {
+      if (g.checked) members(g).forEach(x => x.disabled = true);
+      else g.disabled = true;
+    }
+  });
+  // Restore inputs if the page is shown again from the back/forward cache.
+  window.addEventListener('pageshow', () => root.querySelectorAll('input').forEach(x => x.disabled = false));
+  sync();
+})();
+</script>

@@ -2,38 +2,41 @@
 # P+ 2.3 onward and 2.28/2.29: official release dates from github.com/Project-Plus-Development-Team/PPlusReleases.
 # P+ 2.0: date it was revealed per ssbwiki.com/Project%2B. P+ v1b: ssbwiki only says "April 2019", so 04/01/19 is approximate.
 # PM: release dates from ssbwiki.com/Project_M (Release history).
+# P+ releases without their own notes link to the newest release in the same series (e.g. 2.5 -> 2.5.2).
+# P+ v1b has no later v1 release with notes, so it links to SmashWiki.
+# PM links go to dragdown.wiki: the version page where one exists, otherwise the SmashWiki section.
 P+ 3.2.1,10/19/26,https://projectplusgame.com/changes/3.2.1
 P+ 3.2,08/05/26,https://projectplusgame.com/changes/3.2
 P+ 3.1.5,10/12/25,https://projectplusgame.com/changes/3.1.5
 P+ 3.1.2,05/02/25,https://projectplusgame.com/changes/3.1.2
-P+ 3.1.1,05/01/25,https://github.com/Project-Plus-Development-Team/PPlusReleases/releases/tag/v3.1.1
+P+ 3.1.1,05/01/25,https://projectplusgame.com/changes/3.1.5
 P+ 3.1.0,04/23/25,https://projectplusgame.com/changes/3.1.0
 P+ 3.0.5,09/23/24,https://projectplusgame.com/changes/3.0.5
 P+ 3.0.2,06/27/24,https://projectplusgame.com/changes/3.0.2
 P+ 3.0.1,06/24/24,https://projectplusgame.com/changes/3.0.1
 P+ 2.5.2,03/06/24,https://projectplusgame.com/changes/2.5.2
-P+ 2.5.1,02/13/24,https://github.com/Project-Plus-Development-Team/PPlusReleases/releases/tag/2.5.1
-P+ 2.5,02/06/24,https://github.com/Project-Plus-Development-Team/PPlusReleases/releases/tag/2.5
+P+ 2.5.1,02/13/24,https://projectplusgame.com/changes/2.5.2
+P+ 2.5,02/06/24,https://projectplusgame.com/changes/2.5.2
 P+ 2.4.2,07/07/23,https://projectplusgame.com/changes/2.4.2
 P+ 2.4.1,05/19/23,https://projectplusgame.com/changes/2.4.1
-P+ 2.4,05/17/23,https://github.com/Project-Plus-Development-Team/PPlusReleases/releases/tag/2.4
+P+ 2.4,05/17/23,https://projectplusgame.com/changes/2.4.2
 P+ 2.3.2,01/01/23,https://projectplusgame.com/changes/2.3.2
 P+ 2.3.1,09/08/22,https://projectplusgame.com/changes/2.3.1
-P+ 2.3,09/06/22,https://github.com/Project-Plus-Development-Team/PPlusReleases/releases/tag/2.3
+P+ 2.3,09/06/22,https://projectplusgame.com/changes/2.3.2
 P+ 2.29,08/20/21,https://projectplusgame.com/changes/2.29
 P+ 2.28,05/04/21,https://projectplusgame.com/changes/2.28
 P+ 2.0,03/17/20,https://projectplusgame.com/changes/2.0
 P+ v1b,04/01/19,https://www.ssbwiki.com/Project%2B
-PM 3.6,08/16/15,https://www.ssbwiki.com/Project_M#v3.6
+PM 3.6,08/16/15,https://dragdown.wiki/wiki/PPlus/Version/PM_3.6
 PM 3.6 Beta,06/24/15,https://www.ssbwiki.com/Project_M#v3.6.CE.B2
-PM 3.5,11/14/14,https://www.ssbwiki.com/Project_M#v3.5
+PM 3.5,11/14/14,https://dragdown.wiki/wiki/PPlus/Version/PM_3.5
 PM 3.02,01/13/14,https://www.ssbwiki.com/Project_M#v3.02
 PM 3.01,01/11/14,https://www.ssbwiki.com/Project_M#v3.01
-PM 3.0,12/09/13,https://www.ssbwiki.com/Project_M#v3.0
-PM Demo 2.6b,08/15/13,https://www.ssbwiki.com/Project_M#Demo_2.6b
+PM 3.0,12/09/13,https://dragdown.wiki/wiki/PPlus/Version/PM_3.0
+PM Demo 2.6b,08/15/13,https://dragdown.wiki/wiki/PPlus/Version/PM_2.6b
 PM Demo 2.6,07/17/13,https://www.ssbwiki.com/Project_M#Demo_2.6
-PM Demo 2.5b,01/06/13,https://www.ssbwiki.com/Project_M#Demo_2.5b
-PM Demo 2.5,12/29/12,https://www.ssbwiki.com/Project_M#Demo_2.5
-PM Demo 2.1,05/23/12,https://www.ssbwiki.com/Project_M#Demo_2.1
+PM Demo 2.5b,01/06/13,https://dragdown.wiki/wiki/PPlus/Version/PM_2.5b
+PM Demo 2.5,12/29/12,https://dragdown.wiki/wiki/PPlus/Version/PM_2.5
+PM Demo 2.1,05/23/12,https://dragdown.wiki/wiki/PPlus/Version/PM_2.1
 PM Demo 2.0,04/17/12,https://www.ssbwiki.com/Project_M#Demo_2.0
 PM Demo 1.0,02/07/11,https://www.ssbwiki.com/Project_M#Demo_1.0

@@ -70,6 +70,10 @@ CREATE TABLE vod (
   c3_id INTEGER,
   p4_id INTEGER,
   c4_id INTEGER,
+  -- Characters after the first, when a player used several ("Falco, Fox" on the sheet): comma-separated
+  -- game_character IDs in the order listed, e.g. "8" or "8,22". NULL when they used one character.
+  c1_extra_ids TEXT,
+  c2_extra_ids TEXT,
   submission_id INTEGER,
   vod_date TIMESTAMP,
   round TEXT,
