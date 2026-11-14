@@ -180,3 +180,7 @@ def contact_page():
 @app.route("/about")
 def about_page():
     return render_template("home.jinja2")
+
+@app.route("/resources")
+def resources_page():
+    return render_template("home.jinja2")

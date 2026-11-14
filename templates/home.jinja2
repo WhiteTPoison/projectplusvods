@@ -59,5 +59,10 @@
         <div class="infoPages">
             {% include "./about/about.jinja2" %}
         </div>
+    {# Other Resources Page Render #}
+    {% elif request.path == "/resources" %}
+        <div class="infoPages">
+            {% include "./resources/resources.jinja2" %}
+        </div>
     {% endif %}
 </body>

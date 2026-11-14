@@ -525,6 +525,7 @@ body:has(details[closed]) summary {
 	border-radius: 5px;
 	transition: background-color 0.3s ease;
 	padding: 0 1rem;
+	white-space: nowrap;
 }
 
 .navbar a:hover {

@@ -1,0 +1,15 @@
+.resourceList li {
+	margin-bottom: 0.8rem;
+}
+
+.resourceDesc {
+	display: block;
+	font-size: 1rem;
+	color: #bbb;
+}
+
+.resourceNote {
+	margin-top: 2rem;
+	font-size: 1rem;
+	color: #bbb;
+}
